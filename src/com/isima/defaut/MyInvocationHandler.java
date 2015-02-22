@@ -57,10 +57,12 @@ public class MyInvocationHandler implements InvocationHandler {
 	public Object invoke(Object arg0, Method arg1, Object[] arg2)
 			throws Throwable {
 		// TODO Auto-generated method stub
-		if (arg1.toString().equals(""))
-			return this;
-		
-		else return this.toString();
+		System.out.println(arg1.toString());
+		if (arg1.toString().contains("toString"))
+			return this.toString();
+		else 
+			return "coucou";
+	
 	}
 
 }

@@ -28,6 +28,7 @@ public class EjbTests {
 		System.out.println(object.getClass().getInterfaces().toString());
 		System.out.println(IMaClasse.class.toString());
 		assertNotNull(object);
+		System.out.println(object.toString());
 		
 	}
 		

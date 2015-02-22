@@ -69,7 +69,7 @@ public class EJBContainer {
 	public Object create(Class class1)
 	{
 		
-		Object res = null;
+		Proxy res = null;
 		
 		// recherche de la classe implémentant l'interface
 		Reflections reflections = new Reflections("");
@@ -92,10 +92,9 @@ public class EJBContainer {
 				 Class proxyClass = Proxy.getProxyClass(
 						 class1.getClassLoader(), new Class[] { class1 });
 				 
-				 
 				 InvocationHandler handler = new MyInvocationHandler(c);
 				 
-				 res = Proxy.newProxyInstance(IMaClasse.class.getClassLoader(),
+				 res = (Proxy) Proxy.newProxyInstance(IMaClasse.class.getClassLoader(),
                          new Class[] { IMaClasse.class},
                          handler);
 				 
@@ -115,11 +114,15 @@ public class EJBContainer {
 					else
 						registre.get(c.getName()).add(nb_ejb);
 					
+					Proxy r = res;
 					
-					System.out.println(ejbsNonDispos.size());
-					 System.out.println(ejbsNonDispos.toString() + " "+ res.toString() +  " " + c.getName());
 				
-						 ejbsNonDispos.put( nb_ejb, res);
+				 	System.out.println(ejbsNonDispos.toString() + " "+ (class1.cast( r )) +  " " + c.getName());
+			
+				    ejbsNonDispos.put( nb_ejb, (Proxy) res);
+						 
+						 
+				
 					nb_ejb++;
 				}
 					
