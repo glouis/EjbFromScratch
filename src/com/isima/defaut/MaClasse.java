@@ -24,5 +24,7 @@ public class MaClasse implements IMaClasse{
 		
 	}
 
-	
+	public void sayHello() {
+		System.out.println("Hello");
+	}
 }

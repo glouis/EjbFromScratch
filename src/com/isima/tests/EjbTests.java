@@ -27,6 +27,7 @@ public class EjbTests {
 		IMaClasse object =  (IMaClasse) EjbC.create(IMaClasse.class);
 		System.out.println(object.getClass().getInterfaces().toString());
 		System.out.println(IMaClasse.class.toString());
+		object.sayHello();
 		assertNotNull(object);
 		
 	}
@@ -38,6 +39,5 @@ public class EjbTests {
 		EjbC.consultTransationManager();
 		obj.readDB();
 	}
-	
 	
 }
