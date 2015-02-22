@@ -1,6 +1,6 @@
 package com.isima.annotations;
 
-// le bean implement plus d'une interface
+// le bean implemente plus d'une interface
 public @interface local {
 
 }

@@ -24,8 +24,11 @@ public class EjbTests {
 	@Test
 	public void testNonManaged() {
 		EJBContainer EjbC = new EJBContainer();
-		Object object = EjbC.create(IMaClasse.class);
+		IMaClasse object =  (IMaClasse) EjbC.create(IMaClasse.class);
+		System.out.println(object.getClass().getInterfaces().toString());
+		System.out.println(IMaClasse.class.toString());
 		assertNotNull(object);
+		
 	}
 		
 	@Test

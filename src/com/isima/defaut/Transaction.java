@@ -2,23 +2,33 @@ package com.isima.defaut;
 
 public class Transaction {
 
-	void begin()
+	public void begin()
 	{
 		System.out.println("begin");
 	}
 	
-	void rollBack()
+	public void rollBack()
 	{
 		System.out.println("rollBack");
 	}
 	
-	void commit()
+	public void commit()
 	{
 		System.out.println("commit");
 	}
 	
-	void execute()
+	public void execute()
 	{
 		System.out.println("execute");
+	}
+	
+	public void stop()
+	{
+		System.out.println("stopped");
+	}
+	
+	public void resume()
+	{
+		System.out.println("resume");
 	}
 }
