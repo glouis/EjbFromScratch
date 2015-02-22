@@ -7,14 +7,22 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+
+
+
+
+
 import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
 
 import com.isima.annotations.ejb;
 import com.isima.annotations.local;
+import com.isima.interfaces.IMaClasse;
 
 
 
@@ -22,9 +30,35 @@ import com.isima.annotations.local;
 
 public class EJBContainer {
 
-	List<Object> ejbsNonDispos;
-	List<Object> ejbsDispos;
+	private static EJBContainer instance;
 	
+	public static EJBContainer getInstance()
+	{
+		
+		if (instance == null)
+			synchronized (EJBContainer.class) {
+				if (instance == null)
+					instance = new EJBContainer();
+			}
+		
+		return instance;
+	}
+	
+	private Integer nb_ejb = 0;
+	private Map<Integer, Object > ejbsNonDispos;
+	private Map<Integer, Object>  ejbsDispos;
+	
+	private HashMap<String, List<Integer>> registre;
+	
+	int NB_EJB = 1;
+	
+	
+	private EJBContainer()
+	{
+		ejbsNonDispos = new HashMap<>();
+		ejbsDispos = new HashMap<>();
+		registre = new HashMap<>();
+	}
 	
 	public void manage(Object s)
 	{
@@ -48,8 +82,9 @@ public class EJBContainer {
 			 System.out.println("class found : " + c.getName());
 			 
 			 
-			 //nb d'ejb == 1
-			 if ( c.getInterfaces().length == 1 )
+			 //nb d'ejb atteint? 
+			 
+			 if ( null == registre.get(c.getName()) || NB_EJB == registre.get(c.getName()).size() )
 			 {
 				 
 				// création du proxy
@@ -60,38 +95,40 @@ public class EJBContainer {
 				 
 				 InvocationHandler handler = new MyInvocationHandler(c);
 				 
+				 res = Proxy.newProxyInstance(IMaClasse.class.getClassLoader(),
+                         new Class[] { IMaClasse.class},
+                         handler);
 				 
-				 try {
-					res =  proxyClass.
-					         getConstructor(new Class[] { InvocationHandler.class }).
-					         newInstance(new Object[] { handler }) ;
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				 
+				 
+				
+				
+				if (res != null)
+				{
+					// enregistrer le proxy
+					if (registre.get(c.getName()) == null)
+					{
+						List list =  new ArrayList<Integer>();
+						list.add(nb_ejb);
+						registre.put(c.getName(), list);
+					}
+					else
+						registre.get(c.getName()).add(nb_ejb);
+					
+					
+					System.out.println(ejbsNonDispos.size());
+					 System.out.println(ejbsNonDispos.toString() + " "+ res.toString() +  " " + c.getName());
+				
+						 ejbsNonDispos.put( nb_ejb, res);
+					nb_ejb++;
 				}
-				 
-				 
+					
 			 }
+			 
+		
+			
 		 }
-		
 		 
-		
-		
 		
 		
 		return class1.cast(res);
@@ -100,7 +137,7 @@ public class EJBContainer {
 	public Object createEntityManager()
 	{
 		return "un autre entity manager";
-		// ou avec la methode create : un entitymanager change avec la transaction
+		// ou avec la methode create : un entity manager change avec la transaction
 	}
 	
 	public Transaction consultTransationManager()
