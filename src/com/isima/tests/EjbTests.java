@@ -7,6 +7,7 @@ import org.junit.Test;
 import com.isima.annotations.ejb;
 import com.isima.defaut.EJBContainer;
 import com.isima.interfaces.IMaClasse;
+import com.isima.interfaces.IMaClassePostConstruct;
 
 public class EjbTests {
 
@@ -22,16 +23,49 @@ public class EjbTests {
 	}
 
 	@Test
-	public void testNonManaged() {
+	public void testBasicInjection() {
+		EJBContainer EjbC = EJBContainer.getInstance();
+		IMaClasse object =  (IMaClasse) EjbC.create(IMaClasse.class);
+
+		assertEquals(object.sayHello(),"Hello");
+		
+		
+		
+	}
+	
+	@Test
+	public void testAtEJB() {
 		EJBContainer EjbC = EJBContainer.getInstance();
 		IMaClasse object =  (IMaClasse) EjbC.create(IMaClasse.class);
 		System.out.println(object.getClass().getInterfaces().toString());
 		System.out.println(IMaClasse.class.toString());
-		object.sayHello();
-		assertNotNull(object);
-		System.out.println(object.toString());
+		assertEquals(object.subHello(),"Hello from MaClasseSub");
+
 		
 	}
+	
+	@Test
+	public void testTransactionnal() {
+		EJBContainer EjbC = EJBContainer.getInstance();
+		IMaClasse object =  (IMaClasse) EjbC.create(IMaClasse.class);
+		System.out.println(object.getClass().getInterfaces().toString());
+		System.out.println(IMaClasse.class.toString());
+		object.readDB();
+		assertNotNull(object);
+		
+	}
+	
+	
+	@Test
+	public void testPostConstruct() {
+		EJBContainer EjbC = EJBContainer.getInstance();
+		IMaClassePostConstruct object =  (IMaClassePostConstruct) EjbC.create(IMaClassePostConstruct.class);
+
+		assertEquals(object.sayHello(),"success");
+		
+		
+	}
+	
 		
 	@Test
 	public void testManaged()

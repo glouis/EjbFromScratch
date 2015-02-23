@@ -4,31 +4,23 @@ public class Transaction {
 
 	public void begin()
 	{
-		System.out.println("begin");
+		System.out.println("from Transaction " + this.toString() + ": begin");
 	}
 	
 	public void rollBack()
 	{
-		System.out.println("rollBack");
+		System.out.println("from Transaction " + this.toString() + ": rollBack");
 	}
 	
 	public void commit()
 	{
-		System.out.println("commit");
+		System.out.println("from Transaction " + this.toString() + ": commit");
 	}
 	
 	public void execute()
 	{
-		System.out.println("execute");
+		System.out.println("from Transaction " + this.toString() + ": execute");
 	}
 	
-	public void stop()
-	{
-		System.out.println("stopped");
-	}
 	
-	public void resume()
-	{
-		System.out.println("resume");
-	}
 }

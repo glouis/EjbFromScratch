@@ -5,6 +5,7 @@ import com.isima.annotations.persitantContext;
 import com.isima.annotations.stateless;
 import com.isima.annotations.transactionnal;
 import com.isima.interfaces.IMaClasse;
+import com.isima.interfaces.IMaClasseSub;
 
 @transactionnal
 @stateless
@@ -14,7 +15,7 @@ public class MaClasse implements IMaClasse{
 	EntityManager monManager;
 	
 	@ejb
-	MaClasseSub sub;
+	IMaClasseSub sub;
 	
 	public void readDB() {
 		// TODO Auto-generated method stub
@@ -23,8 +24,15 @@ public class MaClasse implements IMaClasse{
 		sub.readDB();
 		
 	}
+	
+	public String subHello() {
+	
+		return sub.sayHello();
+		
+	}
 
-	public void sayHello() {
+	public String sayHello() {
 		System.out.println("Hello");
+		return "Hello";
 	}
 }

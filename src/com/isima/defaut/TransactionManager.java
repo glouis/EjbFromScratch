@@ -5,12 +5,29 @@ import java.util.List;
 
 import com.isima.annotations.singleton;
 
-@singleton
+
 public class TransactionManager {
 
+	private static TransactionManager instance;
+	
+	public static TransactionManager getInstance()
+	{
+		if (instance == null)
+			synchronized (TransactionManager.class) {
+				if (instance == null)
+					instance = new TransactionManager();
+			}
+		
+		return instance;
+	}
+	
+	
+	
+	
+	
 	private  List<Transaction> transactions;
 	
-	public TransactionManager()
+	private TransactionManager()
 	{
 		transactions = new ArrayList<Transaction>();
 	}
@@ -18,7 +35,10 @@ public class TransactionManager {
 	
 	public Transaction getCurrent()
 	{
-		return transactions.get(transactions.size() -1);
+		if (transactions.size() > 0)
+			return transactions.get(transactions.size() -1);
+		else
+			return addNewTransaction();
 	}
 	
 	boolean hasCurrent()
@@ -30,26 +50,24 @@ public class TransactionManager {
 	{
 		Transaction t = new Transaction();
 		transactions.add(t);
+		System.out.println("new Transaction " + t.toString());
 		return t;
 	}
 	
-	Transaction begin(Transaction t)
+	void remove(Transaction t)
 	{
-		
-		t.begin();
-		transactions.add(t);
-		return t;
-		
+		transactions.remove(t);
+	}
+	
+	
+	public void end( Transaction t)
+	{
+		t.commit();
 	}
 	
 	void rollBack( Transaction t)
 	{
 		t.rollBack();
-	}
-	
-	void commit(  Transaction t )
-	{
-		t.commit();
 	}
 	
 	

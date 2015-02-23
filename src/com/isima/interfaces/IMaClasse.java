@@ -7,6 +7,9 @@ public interface IMaClasse {
 
 	public void readDB();
 	
-	public void sayHello();
+	public String sayHello();
+	
+	public String subHello();
+	
 	
 }
