@@ -1,8 +1,10 @@
 package com.isima.defaut;
 
+import com.isima.annotations.ejb;
 import com.isima.annotations.persitantContext;
 import com.isima.annotations.stateless;
 import com.isima.annotations.transactionnal;
+import com.isima.interfaces.IMaClasse;
 import com.isima.interfaces.IMaClasseSub;
 
 @transactionnal
@@ -11,6 +13,9 @@ public class MaClasseSub implements IMaClasseSub{
 
 	@persitantContext
 	EntityManager monManager;
+	
+	//@ejb
+	//IMaClasse c;
 	
 	public MaClasseSub() {
 		

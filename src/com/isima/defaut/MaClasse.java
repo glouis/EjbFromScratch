@@ -2,6 +2,7 @@ package com.isima.defaut;
 
 import com.isima.annotations.ejb;
 import com.isima.annotations.persitantContext;
+import com.isima.annotations.singleton;
 import com.isima.annotations.stateless;
 import com.isima.annotations.transactionnal;
 import com.isima.interfaces.IMaClasse;
@@ -16,6 +17,7 @@ public class MaClasse implements IMaClasse{
 	
 	@ejb
 	IMaClasseSub sub;
+	
 	
 	public void readDB() {
 		// TODO Auto-generated method stub

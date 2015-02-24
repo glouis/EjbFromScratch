@@ -24,13 +24,17 @@ import java.util.Set;
 
 
 
+
+
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 
 import com.isima.annotations.ejb;
 import com.isima.annotations.local;
 import com.isima.annotations.preDestroy;
+import com.isima.annotations.singleton;
 import com.isima.annotations.stateless;
+import com.isima.annotations.transactionnal;
 import com.isima.interfaces.IMaClasse;
 
 
@@ -57,7 +61,7 @@ public class EJBContainer {
 	private HashMap<Class<?>, Integer> registre;
 	
 	
-	int NB_EJB = 1;
+	int NB_EJB = 2;
 	
 	
 	private EJBContainer()
@@ -158,9 +162,10 @@ public class EJBContainer {
 				ejbsDispos.remove(obj);
 				
 			}
-			//System.out.println("Dispo" + ejbsDispos.toString());
-			//System.out.println("Non Dispo" + ejbsNonDispos.toString());
 		
+		
+			System.out.println("Dispo" + ejbsDispos.toString());
+			System.out.println("Non Dispo" + ejbsNonDispos.toString());
 		}
 	}
 	
@@ -181,9 +186,24 @@ public class EJBContainer {
 			 System.out.println("class found : " + c.getName());
 			 
 			 
-			 //nb d'ejb atteint? 
 			 
-			 if ( null == registre.get(c) || NB_EJB > registre.get(c) )
+			 
+			 ////// test Singleton
+			 boolean single = false;
+			 
+			 Reflections r = new Reflections(c);
+			 Set<Class<?>> singletons = r.getTypesAnnotatedWith(singleton.class);
+			
+			 if (singletons.contains(c))
+			 {
+				 single = true;
+			 }
+			 
+			 ///
+			 
+			 
+			//nb d'ejb atteint?  ou bien est ce un singleton?
+			 if ( null == registre.get(c) || ( NB_EJB > registre.get(c) && !single))
 			 {
 				 
 				// création du proxy
@@ -204,7 +224,7 @@ public class EJBContainer {
 						registre.put(c, 1);
 					}
 					else
-						registre.replace(c, registre.get(c.getName())+1);
+						registre.replace(c, registre.get(c)+1);
 	
 					
 			
@@ -213,6 +233,7 @@ public class EJBContainer {
 			 }
 			 else
 			 {
+				 
 				 for (Object obj : ejbsDispos)
 				 {
 					if (obj.getClass().equals(c))
@@ -223,9 +244,12 @@ public class EJBContainer {
 		                         new Class[] { class1},
 		                         handler);			
 						
+						
 						break;
 					}
+					
 				 }
+				 
 			 }
 			 
 		
