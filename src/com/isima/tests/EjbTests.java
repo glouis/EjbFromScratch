@@ -8,6 +8,7 @@ import com.isima.annotations.ejb;
 import com.isima.defaut.EJBContainer;
 import com.isima.interfaces.IMaClasse;
 import com.isima.interfaces.IMaClassePostConstruct;
+import com.isima.interfaces.IMaClassePreDestroy;
 
 public class EjbTests {
 
@@ -28,7 +29,7 @@ public class EjbTests {
 		IMaClasse object =  (IMaClasse) EjbC.create(IMaClasse.class);
 
 		assertEquals(object.sayHello(),"Hello");
-		
+		object = null;
 		
 		
 	}
@@ -40,6 +41,7 @@ public class EjbTests {
 		System.out.println(object.getClass().getInterfaces().toString());
 		System.out.println(IMaClasse.class.toString());
 		assertEquals(object.subHello(),"Hello from MaClasseSub");
+		
 
 		
 	}
@@ -52,6 +54,7 @@ public class EjbTests {
 		System.out.println(IMaClasse.class.toString());
 		object.readDB();
 		assertNotNull(object);
+	
 		
 	}
 	
@@ -66,13 +69,13 @@ public class EjbTests {
 		
 	}
 	
-		
 	@Test
-	public void testManaged()
-	{
+	public void testPreDestroy() {
 		EJBContainer EjbC = EJBContainer.getInstance();
-		EjbC.consultTransationManager();
-		obj.readDB();
+		IMaClassePreDestroy object = (IMaClassePreDestroy) EjbC.create(IMaClassePreDestroy.class);
+		object.sayHello();
+		EjbC.getInstance().viderPool();
 	}
+	
 	
 }

@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -21,10 +22,15 @@ import java.util.Set;
 
 
 
+
+
 import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
 
 import com.isima.annotations.ejb;
 import com.isima.annotations.local;
+import com.isima.annotations.preDestroy;
+import com.isima.annotations.stateless;
 import com.isima.interfaces.IMaClasse;
 
 
@@ -48,9 +54,10 @@ public class EJBContainer {
 	private List < Object > ejbsNonDispos;
 	private List < Object>  ejbsDispos;
 	
-	private HashMap<String, List<Object>> registre;
+	private HashMap<Class<?>, Integer> registre;
 	
-	int NB_EJB = 3;
+	
+	int NB_EJB = 1;
 	
 	
 	private EJBContainer()
@@ -58,6 +65,7 @@ public class EJBContainer {
 		ejbsNonDispos = new ArrayList<>();
 		ejbsDispos = new ArrayList<>();
 		registre = new HashMap<>();
+		
 	}
 	
 	
@@ -72,21 +80,87 @@ public class EJBContainer {
 		
 		return res;
 	}
+	
+	
 	public void manage(Object obj)
 	{
+		ejbsDispos.add(obj);
+	}
+	
+	
+	public void viderPool()
+	{
+		List<Object> objects = new ArrayList<Object>();
+		for (Object o : ejbsDispos)
+		{
+			objects.add(o);
+		}
+		for (Object o : ejbsNonDispos)
+		{
+			objects.add(o);
+		}
+		
+		for (Object o : objects)
+		{
+			detach(o);
+		}
+	}
+	
+	
+	public void detach(Object obj)
+	{
+		
+		System.out.println(obj.getClass().getName());
+		Reflections r1 = new Reflections (obj.getClass(),new MethodAnnotationsScanner());
+		Set<Method> preDestroys = r1.getMethodsAnnotatedWith(preDestroy.class);
+		
+		for (Method methode : obj.getClass().getDeclaredMethods())
+		{
+			if (preDestroys.contains(methode))
+			{
+				try {
+					methode.invoke(obj.getClass().cast(obj));
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		ejbsNonDispos.remove(obj);
+		ejbsDispos.remove(obj);
+		System.out.println("destroy (non stateless):" + obj);
+		System.out.println("Dispo" + ejbsDispos.toString());
+		System.out.println("Non Dispo" + ejbsNonDispos.toString());
+	
+	}
+	
+	
+	public void switchDispo(Object obj)
+	{
+		synchronized (EJBContainer.class) {
 
-		if(ejbsNonDispos != null && ejbsNonDispos.contains(obj) ) {
-			
-			ejbsDispos.add(obj);
-			ejbsNonDispos.remove(obj);
-			
-			
-			
-		} else {
-			
-			ejbsNonDispos.add(obj);
-			ejbsDispos.remove(obj);
-			
+			if(ejbsNonDispos != null && ejbsNonDispos.contains(obj) ) {
+				
+				ejbsDispos.add(obj);
+				ejbsNonDispos.remove(obj);
+				
+				
+				
+			} else {
+				
+				ejbsNonDispos.add(obj);
+				ejbsDispos.remove(obj);
+				
+			}
+			//System.out.println("Dispo" + ejbsDispos.toString());
+			//System.out.println("Non Dispo" + ejbsNonDispos.toString());
+		
 		}
 	}
 	
@@ -109,7 +183,7 @@ public class EJBContainer {
 			 
 			 //nb d'ejb atteint? 
 			 
-			 if ( null == registre.get(c.getName()) || NB_EJB > registre.get(c.getName()).size() )
+			 if ( null == registre.get(c) || NB_EJB > registre.get(c) )
 			 {
 				 
 				// création du proxy
@@ -119,30 +193,39 @@ public class EJBContainer {
 				 
 				 res = (Proxy) Proxy.newProxyInstance(class1.getClassLoader(),
                          new Class[] { class1},
-                         handler);
-				 
-				 
-				 
-				
+                         handler);			
 				
 				if (res != null)
 				{
 					// enregistrer le proxy
-					if (registre.get(c.getName()) == null)
+					if (registre.get(c) == null)
 					{
-						List list =  new ArrayList<Object>();
-						list.add(res);
-						registre.put(c.getName(), list);
+						
+						registre.put(c, 1);
 					}
 					else
-						registre.get(c.getName()).add(res);
-				
-					ejbsNonDispos.add( (Proxy) res);
-						 
+						registre.replace(c, registre.get(c.getName())+1);
+	
 					
 			
 				}
 					
+			 }
+			 else
+			 {
+				 for (Object obj : ejbsDispos)
+				 {
+					if (obj.getClass().equals(c))
+					{
+						InvocationHandler handler = new MyInvocationHandler(obj);
+						
+						res = (Proxy) Proxy.newProxyInstance(class1.getClassLoader(),
+		                         new Class[] { class1},
+		                         handler);			
+						
+						break;
+					}
+				 }
 			 }
 			 
 		

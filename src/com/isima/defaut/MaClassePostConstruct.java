@@ -1,7 +1,9 @@
 package com.isima.defaut;
 
 import com.isima.annotations.postConstruct;
+import com.isima.annotations.stateless;
 import com.isima.interfaces.IMaClassePostConstruct;
+
 
 public class MaClassePostConstruct implements IMaClassePostConstruct{
 
